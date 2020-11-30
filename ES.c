@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -82,12 +81,11 @@ int fermer(FICHIER *f){
 int fecriref (FICHIER *f, const char *format, ...){
 
 }
+
 int ecriref (const char *format, ...){
     
 }
-int fliref (FICHIER *f, const char *format, ...){
 
-}
 int ecrire(const void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     int written = 0;
     while(TAILLE_BUFF - f->next_oct_libre_w >= taille && written < nbelem) {
@@ -127,4 +125,62 @@ int lire(void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
 int vider(FICHIER *f){
     return 0;
 
+}
+
+int fliref (FICHIER *f, const char *format, ...){
+    int res = (int) '\0';
+    va_list args;
+
+    va_start(args, format);
+
+    int* recup_int;
+    char* recup_char;
+
+    int compteur_format = 0;
+    while(f->next_oct_to_read == TAILLE_BUFF || f->rbuff[f->next_oct_to_read] == "\n" || format[compteur_format] == '\0') {
+        switch(format[compteur_format]){
+            case '%':
+                switch (format[++compteur_format]) {
+                    case 'd':
+                        recup_int = va_arg(args, int*);
+                        lire(recup_int, sizeof(int), 1, f);
+                        compteur_format++;
+                        break;
+                    case 'c':
+                        recup_char = va_arg(args, char*);
+                        lire(recup_char, sizeof(char), 1, f);
+                        compteur_format++;
+                        break;
+                    case 's':
+                        recup_char = va_arg(args, char*);
+                        compteur_format++;
+
+                        char* tmp;
+                        lire(tmp, sizeof(char), 1, f);
+                        while(*tmp != format[compteur_format]) {
+                            strcat(recup_char, tmp);
+                            lire(tmp, sizeof(char), 1, f);
+                        }
+                        f->next_oct_to_read -= sizeof(char);
+                        break;
+                    default:
+                        fecriref(stderr, "%s: Erreur : type de donnée inconnu.", __func__);
+                        format[compteur_format] = '\0';
+                }
+                break;
+            default:
+                char* tmp;
+                lire(tmp, sizeof(char), 1, f);
+                if(*tmp == format[compteur_format]) {
+                    compteur_format++;
+                } else {
+                    fecriref(stderr, "%s: Erreur : format et données d'entrée incohérents.", __func__);
+                    format[compteur_format] = '\0';
+                }
+        }
+    }
+
+    va_end(args);
+
+    return res;
 }
