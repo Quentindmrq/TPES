@@ -28,7 +28,6 @@ FICHIER stdoutinit = {
         .next_oct_libre_w = 0,
         .taille_lue = 0,
         .wbuff = {},
-
 };
 
 FICHIER* stdout = &stdoutinit;
@@ -38,7 +37,6 @@ FICHIER stderrinit = {
         .next_oct_libre_w = 0,
         .taille_lue = 0,
         .wbuff = {},
-
 };
 
 FICHIER* stderr = &stderrinit;
@@ -85,7 +83,6 @@ int ecrire(const void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
         memcpy(f->wbuff + f->next_oct_libre_w, p + (written * taille), taille);
         f->next_oct_libre_w += taille;
         written++;
-
     }
 
     if(written < nbelem || f->next_oct_libre_w == TAILLE_BUFF){
@@ -93,8 +90,8 @@ int ecrire(const void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
         f->next_oct_libre_w = 0;
     }
     return written;
-
 }
+
 int lire(void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     int ret = 0;
 
@@ -114,10 +111,6 @@ int lire(void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     }
     return ret;
 }
-
-
-
-
 
 int vider(FICHIER *f){
     return 0;
