@@ -5,10 +5,9 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 #include <string.h>
-#include <stdio.h>
 
 #if !defined(TAILLE_BUFF)
-#define TAILLE_BUFF 8
+#define TAILLE_BUFF 16
 #endif
 
 struct _ES_FICHIER {
@@ -21,6 +20,28 @@ struct _ES_FICHIER {
 };
 
 typedef struct _ES_FICHIER FICHIER;
+
+const char buff[TAILLE_BUFF];
+
+FICHIER stdoutinit = {
+        .openNb = 1,
+        .next_oct_libre_w = 0,
+        .taille_lue = 0,
+        .wbuff = {},
+
+};
+
+FICHIER* stdout = &stdoutinit;
+
+FICHIER stderrinit = {
+        .openNb = 2,
+        .next_oct_libre_w = 0,
+        .taille_lue = 0,
+        .wbuff = {},
+
+};
+
+FICHIER* stderr = &stderrinit;
 
 FICHIER* ouvrir(char* nom, char mode){
     FICHIER* f = malloc(sizeof(FICHIER));
@@ -49,6 +70,8 @@ FICHIER* ouvrir(char* nom, char mode){
 
 int fermer(FICHIER *f){
     write(f->openNb, f->wbuff, f->next_oct_libre_w);
+    write(1, stdout->wbuff, stdout->next_oct_libre_w);
+    stdout->next_oct_libre_w = 0;
     close(f->openNb);
     free(f);
     return 0;
@@ -97,5 +120,6 @@ int lire(void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
 
 
 int vider(FICHIER *f){
+    return 0;
 
 }

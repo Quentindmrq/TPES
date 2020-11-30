@@ -7,6 +7,7 @@ typedef struct _ES_FICHIER FICHIER;
 FICHIER *stdout;
 FICHIER *stderr;
 
+
 /* mode: 'L' = lecture, 'E' = écriture */
 FICHIER *ouvrir(const char *nom, char mode);
 int fermer(FICHIER*f);
