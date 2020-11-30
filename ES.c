@@ -5,6 +5,7 @@
 #include <fcntl.h> // for open
 #include <unistd.h> // for close
 #include <string.h>
+#include <stdarg.h>
 
 #if !defined(TAILLE_BUFF)
 #define TAILLE_BUFF 16
@@ -71,13 +72,24 @@ FICHIER* ouvrir(char* nom, char mode){
 int fermer(FICHIER *f){
     write(f->openNb, f->wbuff, f->next_oct_libre_w);
     write(1, stdout->wbuff, stdout->next_oct_libre_w);
+    write(2, stderr->wbuff, stderr->next_oct_libre_w);
     stdout->next_oct_libre_w = 0;
+    stderr->next_oct_libre_w = 0;
     close(f->openNb);
     free(f);
     return 0;
 
 }
 
+int fecriref (FICHIER *f, const char *format, ...){
+
+}
+int ecriref (const char *format, ...){
+    
+}
+int fliref (FICHIER *f, const char *format, ...){
+
+}
 int ecrire(const void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     int written = 0;
     while(TAILLE_BUFF - f->next_oct_libre_w >= taille && written < nbelem) {
