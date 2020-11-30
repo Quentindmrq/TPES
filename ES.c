@@ -8,7 +8,7 @@
 #include <stdarg.h>
 
 #if !defined(TAILLE_BUFF)
-#define TAILLE_BUFF 16
+#define TAILLE_BUFF 4
 #endif
 
 struct _ES_FICHIER {
@@ -44,6 +44,13 @@ FICHIER stderrinit = {
 
 FICHIER* stderr = &stderrinit;
 
+int vider(FICHIER *f){
+    int i = write(f->openNb, f->wbuff, f->next_oct_libre_w);
+    f->next_oct_libre_w = 0;
+    return i;
+
+}
+
 FICHIER* ouvrir(char* nom, char mode){
     FICHIER* f = malloc(sizeof(FICHIER));
     int flag;
@@ -71,21 +78,17 @@ FICHIER* ouvrir(char* nom, char mode){
 
 int fermer(FICHIER *f){
     write(f->openNb, f->wbuff, f->next_oct_libre_w);
-    write(1, stdout->wbuff, stdout->next_oct_libre_w);
-    write(2, stderr->wbuff, stderr->next_oct_libre_w);
-    stdout->next_oct_libre_w = 0;
-    stderr->next_oct_libre_w = 0;
-    close(f->openNb);
+    vider(stdout);
+    vider(stderr);
     free(f);
     return 0;
 
 }
 
-int fecriref (FICHIER *f, const char *format, ...){
 
-}
 int ecriref (const char *format, ...){
-    
+
+
 }
 int fliref (FICHIER *f, const char *format, ...){
 
@@ -101,8 +104,7 @@ int ecrire(const void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     }
 
     if(written < nbelem || f->next_oct_libre_w == TAILLE_BUFF){
-        write(f->openNb, f->wbuff, f->next_oct_libre_w);
-        f->next_oct_libre_w = 0;
+        vider(f);
     }
     return written;
 
@@ -127,11 +129,83 @@ int lire(void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     return ret;
 }
 
+int* decompose(int nombre){
+    int base = 10;
+    int div = 1;
+    int nb = nombre;
+    int pas = 1;
+    int* ret = malloc(sizeof(int) * 17);
+    if(nb >= 10){
+        while(nb/div >= base){
+            div *= base;
+        }
+        while(div != 1){
+            ret[pas] = nb/div;
+            nb = nb%div;
+            div = div/base;
+            pas ++;
+        }
+    }
+    ret[pas] = nb;
+    ret[0] = pas;
+    return ret;
+}
 
 
+int fecriref (FICHIER *f, const char *format, ...){
+    va_list ap;
+    va_start(ap, format);
+    char* text = format;
 
+    while(*text != '\0'){
 
-int vider(FICHIER *f){
-    return 0;
+        if(*text == '%'){
+
+            text ++;
+            char *s;
+            int i;
+            int stop;
+            int *decom;
+            char c;
+            switch(*text){
+
+                case 's':
+                    s = va_arg(ap, char*);
+                    ecrire(s, sizeof(char), strlen(s), f);
+                    break;
+                case 'd':
+                    decom = decompose(va_arg(ap, int));
+                    i = 0;
+                    stop = *decom;
+                    while(i < stop){
+                        decom ++;
+                        if(*decom > 10){
+                            exit(0);
+                        }
+                        c = *decom + '0';
+                        ecrire(&c, sizeof(char), 1, f);
+                        i++;
+                    }
+                    break;
+                case 'c':
+                    i = va_arg(ap, int);
+                    ecrire(&i, sizeof(char), 1, f);
+                    break;
+                default:
+                    return -1;
+            }
+        }else{
+            ecrire(text, sizeof(char), 1, f);
+        }
+        text++;
+
+    }
+
+    va_end(ap);
+
 
 }
+
+
+
+
