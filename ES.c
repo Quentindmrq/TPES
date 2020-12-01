@@ -7,7 +7,7 @@
 #include <stdarg.h>
 
 #if !defined(TAILLE_BUFF)
-#define TAILLE_BUFF 4
+#define TAILLE_BUFF 64
 #endif
 
 struct _ES_FICHIER {
@@ -99,10 +99,7 @@ int ecrire(const void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     return written;
 }
 
-int ecriref (const char *format, ...){
 
-
-}
 
 int lire(void *p, unsigned int taille, unsigned int nbelem, FICHIER *f){
     int ret = 0;
@@ -151,6 +148,7 @@ int fecriref (FICHIER *f, const char *format, ...){
     va_list ap;
     va_start(ap, format);
     char* text = format;
+    int ret = 0;
 
     while(*text != '\0'){
 
@@ -162,10 +160,12 @@ int fecriref (FICHIER *f, const char *format, ...){
             int stop;
             int *decom;
             char c;
+
             switch(*text){
 
                 case 's':
                     s = va_arg(ap, char*);
+                    i = 0;
                     ecrire(s, sizeof(char), strlen(s), f);
                     break;
                 case 'd':
@@ -193,16 +193,61 @@ int fecriref (FICHIER *f, const char *format, ...){
             ecrire(text, sizeof(char), 1, f);
         }
         text++;
+        ret ++;
 
     }
 
     va_end(ap);
+    return ret;
 
 
 }
 
+int ecriref (const char *format, ...){
+    va_list ap;
+    va_start(ap, format);
+    char* text = format;
+    int ret = 0;
 
-int fliref (FICHIER *f, const char *format, ...){
+    while(*text != '\0'){
+
+        if(*text == '%'){
+
+            text ++;
+            char *s;
+            int i;
+
+            switch(*text){
+
+                case 's':
+                    s = va_arg(ap, char*);
+                    i = 0;
+                    ecrire(s, sizeof(char), strlen(s), stdout);
+                    break;
+                case 'd':
+                    s = "%d";
+                    fecriref(stdout, s, va_arg(ap, int));
+                    break;
+                case 'c':
+                    i = va_arg(ap, int);
+                    ecrire(&i, sizeof(char), 1, stdout);
+                    break;
+                default:
+                    return -1;
+            }
+        }else{
+            ecrire(text, sizeof(char), 1, stdout);
+        }
+        text++;
+        ret ++;
+
+    }
+
+    va_end(ap);
+    return ret;
+}
+
+/*int fliref (FICHIER *f, const char *format, ...){
     int res = (int) '\0';
     va_list args;
 
@@ -258,5 +303,5 @@ int fliref (FICHIER *f, const char *format, ...){
     va_end(args);
 
     return res;
-}
+}*/
 
