@@ -247,7 +247,7 @@ int ecriref (const char *format, ...){
     return ret;
 }
 
-/*int fliref (FICHIER *f, const char *format, ...){
+int fliref (FICHIER *f, const char *format, ...){
     int res = (int) '\0';
     va_list args;
 
@@ -303,5 +303,5 @@ int ecriref (const char *format, ...){
     va_end(args);
 
     return res;
-}*/
+}
 
