@@ -211,8 +211,10 @@ int fliref (FICHIER *f, const char *format, ...){
     int* recup_int;
     char* recup_char;
 
+    char* tmp = malloc(sizeof(char));
+
     int compteur_format = 0;
-    while(f->next_oct_to_read == TAILLE_BUFF || f->rbuff[f->next_oct_to_read] == "\n" || format[compteur_format] == '\0') {
+    while(f->next_oct_to_read == TAILLE_BUFF || f->rbuff[f->next_oct_to_read] == '\n' || format[compteur_format] == '\0') {
         switch(format[compteur_format]){
             case '%':
                 switch (format[++compteur_format]) {
@@ -230,7 +232,6 @@ int fliref (FICHIER *f, const char *format, ...){
                         recup_char = va_arg(args, char*);
                         compteur_format++;
 
-                        char* tmp;
                         lire(tmp, sizeof(char), 1, f);
                         while(*tmp != format[compteur_format]) {
                             strcat(recup_char, tmp);
@@ -240,17 +241,16 @@ int fliref (FICHIER *f, const char *format, ...){
                         break;
                     default:
                         fecriref(stderr, "%s: Erreur : type de donnée inconnu.", __func__);
-                        format[compteur_format] = '\0';
+                        exit(-1);
                 }
                 break;
             default:
-                char* tmp;
                 lire(tmp, sizeof(char), 1, f);
                 if(*tmp == format[compteur_format]) {
                     compteur_format++;
                 } else {
                     fecriref(stderr, "%s: Erreur : format et données d'entrée incohérents.", __func__);
-                    format[compteur_format] = '\0';
+                    exit(-1);
                 }
         }
     }
