@@ -267,8 +267,22 @@ int fliref (FICHIER *f, const char *format, ...){
                 switch (format[compteur_format]) {
                     case 'd':
                         recup_int = va_arg(args, int*);
-                        lire(recup_int, sizeof(int), 1, f);
-                        res++;
+
+                        int i = 0;
+                        do {
+                            tmp = realloc(tmp, sizeof(char) * (i+1));
+                            lire(tmp+i, sizeof(char), 1, f);
+                            i++;
+                            res++;
+                        } while (*(tmp+(i-1)) != format[compteur_format+1] &&
+                                 (*(tmp+(i-1)) == '0' || *(tmp+(i-1)) == '1' || *(tmp+(i-1)) == '2'
+                                  || *(tmp+(i-1)) == '3' || *(tmp+(i-1)) == '4' || *(tmp+(i-1)) == '5'
+                                  || *(tmp+(i-1)) == '6' || *(tmp+(i-1)) == '7'
+                                  || *(tmp+(i-1)) == '8' || *(tmp+(i-1)) == '9'));
+                        f->next_oct_to_read -= sizeof(char);
+                        tmp = realloc(tmp, sizeof(char) * (i-1));
+                        *recup_int = atoi(tmp);
+                        tmp = malloc(sizeof(char));
                         break;
                     case 'c':
                         recup_char = va_arg(args, char*);
@@ -277,6 +291,7 @@ int fliref (FICHIER *f, const char *format, ...){
                         break;
                     case 's':
                         recup_char = va_arg(args, char*);
+                        strcpy(recup_char, "");
 
                         lire(tmp, sizeof(char), 1, f);
                         res++;
