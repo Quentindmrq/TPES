@@ -7,7 +7,7 @@
 #include <stdarg.h>
 
 #if !defined(TAILLE_BUFF)
-#define TAILLE_BUFF 64
+#define TAILLE_BUFF 128
 #endif
 
 struct _ES_FICHIER {

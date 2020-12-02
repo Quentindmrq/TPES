@@ -19,6 +19,7 @@ int main(int argc, char *argv[]){
     fliref(f2, "end %d %s", &d, my_word);
     fecriref(stdout, "Now read '%d' and '%s' from %s\n", d, my_word, "src_fliref.txt");
 
+    vider(stdout);
     fermer(f2);
 }
 
