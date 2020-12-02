@@ -248,7 +248,7 @@ int ecriref (const char *format, ...){
 }
 
 int fliref (FICHIER *f, const char *format, ...){
-    int res = (int) '\0';
+    int res = 0;
     va_list args;
 
     va_start(args, format);
@@ -257,47 +257,80 @@ int fliref (FICHIER *f, const char *format, ...){
     char* recup_char;
 
     char* tmp = malloc(sizeof(char));
+    int fin = 0;
 
     int compteur_format = 0;
-    while(f->next_oct_to_read == TAILLE_BUFF || f->rbuff[f->next_oct_to_read] == '\n' || format[compteur_format] == '\0') {
-        switch(format[compteur_format]){
+    while(!fin && f->next_oct_to_read > 0 && format[compteur_format] != '\0') {
+        switch(format[compteur_format]) {
             case '%':
-                switch (format[++compteur_format]) {
+                compteur_format++;
+                switch (format[compteur_format]) {
                     case 'd':
                         recup_int = va_arg(args, int*);
                         lire(recup_int, sizeof(int), 1, f);
-                        compteur_format++;
+                        res++;
                         break;
                     case 'c':
                         recup_char = va_arg(args, char*);
                         lire(recup_char, sizeof(char), 1, f);
-                        compteur_format++;
+                        res++;
                         break;
                     case 's':
                         recup_char = va_arg(args, char*);
-                        compteur_format++;
 
                         lire(tmp, sizeof(char), 1, f);
-                        while(*tmp != format[compteur_format]) {
+                        res++;
+                        while (*tmp != format[compteur_format+1] && *tmp != '\n'
+                                && *tmp != ' ' && *tmp != '\t' && *tmp != '\0') {
                             strcat(recup_char, tmp);
                             lire(tmp, sizeof(char), 1, f);
+                            res++;
                         }
                         f->next_oct_to_read -= sizeof(char);
+                        tmp = malloc(sizeof(char));
                         break;
                     default:
                         fecriref(stderr, "%s: Erreur : type de donnée inconnu.", __func__);
                         exit(-1);
                 }
                 break;
-            default:
+            case '\0':
+                fin = 1;
+                break;
+            case ' ':
+            case '\t':
                 lire(tmp, sizeof(char), 1, f);
-                if(*tmp == format[compteur_format]) {
-                    compteur_format++;
+                if(*tmp == ' ' || *tmp == '\t') {
+                    do {
+                        lire(tmp, sizeof(char), 1, f);
+                    } while(*tmp == ' ' || *tmp == '\t');
+                    f->next_oct_to_read -= sizeof(char);
+                    tmp = malloc(sizeof(char));
+
+                    while(format[compteur_format] == ' ' || format[compteur_format] == '\t') {
+                        compteur_format++;
+                    }
+                    compteur_format--;
                 } else {
                     fecriref(stderr, "%s: Erreur : format et données d'entrée incohérents.", __func__);
                     exit(-1);
                 }
+                break;
+            default:
+                lire(tmp, sizeof(char), 1, f);
+                res++;
+                if((*tmp != format[compteur_format] && *tmp == '\n') || *tmp == '\0') {
+                    fin = 1;
+                } else if(*tmp != format[compteur_format]) {
+                    fecriref(stderr, "%s: Erreur : format et données d'entrée incohérents.", __func__);
+                    exit(-1);
+                }
         }
+        compteur_format++;
+    }
+
+    if(f->rbuff[f->next_oct_to_read] == '\n') {
+        lire(tmp, sizeof(char), 1, f);
     }
 
     va_end(args);
