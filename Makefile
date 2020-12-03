@@ -50,6 +50,8 @@ clean:
 	rm -rf fecriref
 	rm -rf fliref
 	rm -rf rand
+	rm -rf test-format
+	rm -rf libstdes.so.1
 	rm -rf dest.txt
 	touch dest.txt
 	rm -rf rand-file.txt

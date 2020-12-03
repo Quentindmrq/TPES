@@ -7,11 +7,7 @@
 #include <stdarg.h>
 
 #if !defined(TAILLE_BUFF)
-<<<<<<< HEAD:stdes.c
 #define TAILLE_BUFF 1024
-=======
-#define TAILLE_BUFF 128
->>>>>>> 1a0c49f48b70eccdaefe87acf3f768f0746bb806:ES.c
 #endif
 
 struct _ES_FICHIER {
