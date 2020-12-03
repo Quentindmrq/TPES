@@ -5,20 +5,18 @@ EXEC = test
 %.o: %.c
 	$(CC) -o $@ -c $< $(CFLAGS)
 	
-ES.o:
-	gcc -o ES.o -c ES.c $(CFLAGS)
 
-test.o:
-	gcc -o test.o -c test.c $(CFLAGS)
+test: test.o stdes.o
+	gcc -o test test.o stdes.o $(CFLAGS)
+	
+rand: test-rand.o stdes.o
+	$(CC) -o rand test-rand.o stdes.o $(CFLAGS)
 
-test: test.o ES.o
-	gcc -o test test.o ES.o $(CFLAGS)
+fecriref : test_fecriref.o stdes.o
+	$(CC) -o fecriref test_fecriref.o stdes.o $(CFLAGS)
 
-fecriref : test_fecriref.o ES.o
-	$(CC) -o fecriref test_fecriref.o ES.o $(CFLAGS)
-
-fliref : test_fliref.o ES.o
-	$(CC) -o fliref test_fliref.o ES.o $(CFLAGS)
+fliref : test_fliref.o stdes.o
+	$(CC) -o fliref test_fliref.o stdes.o $(CFLAGS)
 
 run:
 	./test src.txt dest.txt
@@ -28,6 +26,19 @@ runf:
 
 runfliref:
 	./fliref
+	
+createlib:
+	$(CC) -c -fPIC stdes.c
+	$(CC) -shared -o libstdes.so.1 stdes.o
+	
+
+testformat:
+	$(CC) -c test-format.c $(CFLAGS)
+	$(CC) -o test-format test-format.o libstdes.so.1 $(CFLAGS)
+	export LD_LIBRARY_PATH=.
+
+runrand:
+	./rand
 
 clean:
 	rm -rf *.o
@@ -36,3 +47,5 @@ clean:
 	rm -rf fliref
 	rm -rf dest.txt
 	touch dest.txt
+	rm -rf rand-file.txt
+	touch rand-file.txt

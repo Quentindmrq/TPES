@@ -7,7 +7,7 @@
 #include <stdarg.h>
 
 #if !defined(TAILLE_BUFF)
-#define TAILLE_BUFF 64
+#define TAILLE_BUFF 1024
 #endif
 
 struct _ES_FICHIER {
@@ -157,6 +157,7 @@ int fecriref (FICHIER *f, const char *format, ...){
             text ++;
             char *s;
             int i;
+            int nb;
             int stop;
             int *decom;
             char c;
@@ -169,13 +170,19 @@ int fecriref (FICHIER *f, const char *format, ...){
                     ecrire(s, sizeof(char), strlen(s), f);
                     break;
                 case 'd':
-                    decom = decompose(va_arg(ap, int));
+                    nb = va_arg(ap, int);
                     i = 0;
+                    if(nb < 0){
+                        c = '-';
+                        ecrire(&c, sizeof(char), 1, f);
+                        nb = nb *-1;
+                    }
+                    decom = decompose(nb);
                     stop = *decom;
                     while(i < stop){
                         decom ++;
                         if(*decom > 10){
-                            exit(0);
+                            exit(-1);
                         }
                         c = *decom + '0';
                         ecrire(&c, sizeof(char), 1, f);

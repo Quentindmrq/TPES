@@ -19,9 +19,15 @@ int main(int argc, char *argv[]){
     fecriref(stdout, "test du int %d \n", 123456);
     fecriref(stdout, "test du int %d \n", 1234567);
     fecriref(stdout, "test du int %d \n", 12345678);
-    fecriref(stdout, "test du int %d \n", 945);
+    fecriref(stdout, "test du int %d \n", -945);
+    FICHIER* f = ouvrir("dest.txt", 'E');
+    for (int n=-11;n<11;n++){
+        fecriref (f, "%d ", n);
+    }
+    vider(f);
 
-    fecriref(stdout, "test du string %s \n", "je suis le test");
+
+    fecriref(stdout, "\n test du string %s \n", "je suis le test");
 
     fecriref(stdout, "%d, ahah %d, %c, %s\n", 10, 1548, 123, "hola mamacitas");
     char* s = "fhezsfbds zefy bsudh fuqzevs fdh \n";
