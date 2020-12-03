@@ -25,7 +25,8 @@ runf:
 	./fecriref
 
 runfliref:
-	./fliref
+	./fliref src_fliref.txt
+
 	
 createlib:
 	$(CC) -c -fPIC stdes.c
@@ -39,6 +40,9 @@ testformat:
 
 runrand:
 	./rand
+
+
+
 
 clean:
 	rm -rf *.o
