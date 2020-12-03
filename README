@@ -1,0 +1,13 @@
+utilisation du makefile:
+
+make test/make run : compile et run le test.c
+
+make rand/make runrand : compile et run le test-rand.c
+
+make fecriref/make runf :
+make fliref/make runfliref : compile et run nos test personnels
+
+make createlib : crée la lib partagé
+make testformat : compile test-format
+
+make clean : clean
