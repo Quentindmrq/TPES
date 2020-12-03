@@ -15,13 +15,13 @@ int main(int argc, char *argv[]){
     int  d;
     char my_word[128];
 
-    f2 = ouvrir("src_fliref.txt", 'L');
+    f2 = ouvrir (argv[1], 'L');
 
-    fliref(f2, "\ttest %c end %s", &c, my_word);
-    fecriref(stdout, "Read '%c' and '%s' from %s\n", c, my_word, "src_fliref.txt");
+    fliref (f2, "  test  %c end %s", &c, my_word);
+    ecriref ("Read '%c' and '%s' from %s\n", c, my_word, argv[1]);
 
-    fliref(f2, "end %d %s", &d, my_word);
-    fecriref(stdout, "Now read '%d' and '%s' from %s\n", d, my_word, "src_fliref.txt");
+    fliref (f2, "end %d %s", &d, my_word);
+    ecriref ("Now read '%d' and '%s' from %s\n", d, my_word, argv[1]);
 
     vider(stdout);
     fermer(f2);

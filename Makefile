@@ -27,7 +27,7 @@ runf:
 	./fecriref
 
 runfliref:
-	./fliref
+	./fliref src_fliref.txt
 
 clean:
 	rm -rf *.o
